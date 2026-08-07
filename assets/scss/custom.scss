@@ -1,3 +1,30 @@
-/*
-    You can add your own custom styles here.
-*/
+:root {
+    --base-font-family: "LXGW WenKai Screen", "LXGW WenKai", "Noto Serif SC", "Source Han Serif SC", serif;
+}
+
+body {
+    font-family: var(--base-font-family);
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-image: var(--bg-mobile, var(--bg-desktop, none));
+    background-size: var(--bg-size, cover);
+    background-position: var(--bg-position, center);
+    background-repeat: var(--bg-repeat, no-repeat);
+    background-attachment: var(--bg-attachment, fixed);
+    opacity: var(--bg-opacity, 0.15);
+    pointer-events: none;
+}
+
+@media (min-width: 768px) {
+    body::before {
+        background-image: var(--bg-desktop, var(--bg-mobile, none));
+    }
+}

@@ -19,7 +19,7 @@ tags:
 
 https://yundun.console.aliyun.com/?p=scnew#/overviewNew
 
-![](/assets/image/aliyunaq3.png)
+![](https://cdn.kukie.cn/blog/aliyunaq3.png)
 
 ## 这次能领到什么
 
@@ -32,7 +32,7 @@ https://yundun.console.aliyun.com/?p=scnew#/overviewNew
 对经常折腾阿里云相关服务的人来说，这种活动顺手领一下还是挺香的。  
 实物周边倒不一定多值钱，但拿来收藏也还不错。
 
-![](/assets/image/aliyunaq1.png)
+![](https://cdn.kukie.cn/blog/aliyunaq1.png)
 
 ## 领取条件补充
 
@@ -54,7 +54,7 @@ https://yundun.console.aliyun.com/?p=scnew#/overviewNew
 
 如果后续发货了，一般会收到短信提醒。
 
-![](/assets/image/aliyunaq2.png)
+![](https://cdn.kukie.cn/blog/aliyunaq2.png)
 
 ## 其他说明
 
@@ -65,4 +65,4 @@ https://yundun.console.aliyun.com/?p=scnew#/overviewNew
 至于这篇为什么要专门记一下……
 
 大概是因为这波活动看着还行，但 **阿里云确实没给广告费**。  
-所以，阿里云打钱，V 我 50。
+所以，阿里云打钱，V 我 50。`[dog]`

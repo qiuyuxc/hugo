@@ -1,4 +1,4 @@
-{{- $data := hugo.Data.links -}}
+{{- $data := site.Data.links -}}
 {{- $groups := $data.linkGroups | default slice -}}
 {{- $g1 := index $groups 0 -}}
 {{- $g2 := index $groups 1 -}}

@@ -1,5 +1,5 @@
 {{ $layout := default "preview" site.Params.links.layout }}
-{{ $data := hugo.Data.links }}
+{{ $data := site.Data.links }}
 {{- $shuffleDefault := true -}}
 {{- if and $data (isset $data "shuffleGroups") -}}
   {{- $shuffleDefault = $data.shuffleGroups -}}

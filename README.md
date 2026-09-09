@@ -114,4 +114,5 @@ visitorEnable = false   # 需要文章阅读量时改为 true
 - `themes/aiovtue/layouts/partials/scripts.html`（加载 Hero 随机图 `random.js`）
 - `themes/aiovtue/assets/js/hero.js`（Hero 支持随机图：桌面横屏 / 移动竖屏，随机模式隐藏切换箭头）
 - `themes/aiovtue/assets/css/main.scss`（随机图模式的箭头隐藏样式）
+- `themes/aiovtue/layouts/partials/` 下 5 个文件（`links-preview` / `footer-links-prepare` / `post-sidebar-links` / `links-rss-spotlight` / `bangumi-board`）：`hugo.Data.*` → `site.Data.*`，兼容 Cloudflare Pages 默认 Hugo 0.147 构建
 - 主题内 `friend-link-notice.html` 有个性化修改（如有）

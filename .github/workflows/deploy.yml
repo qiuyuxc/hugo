@@ -1,98 +1,64 @@
 name: Build and deploy
+
 on:
   push:
     branches:
       - main
       - master
   workflow_dispatch:
+
 permissions:
   contents: read
   pages: write
   id-token: write
+
 concurrency:
   group: pages
   cancel-in-progress: false
+
 defaults:
   run:
     shell: bash
+
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      DART_SASS_VERSION: 1.97.1
-      GO_VERSION: 1.25.5
-      HUGO_VERSION: 0.154.2
-      NODE_VERSION: 24.12.0
-      TZ: Europe/Oslo
+      HUGO_VERSION: 0.163.3
+      TZ: Asia/Shanghai
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
           submodules: recursive
           fetch-depth: 0
-      - name: Setup Go
-        uses: actions/setup-go@v6
-        with:
-          go-version: ${{ env.GO_VERSION }}
-          cache: false
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v6
-      - name: Create directory for user-specific executable files
-        run: |
-          mkdir -p "${HOME}/.local"
-      - name: Install Dart Sass
-        run: |
-          curl -sLJO "https://github.com/sass/dart-sass/releases/download/${DART_SASS_VERSION}/dart-sass-${DART_SASS_VERSION}-linux-x64.tar.gz"
-          tar -C "${HOME}/.local" -xf "dart-sass-${DART_SASS_VERSION}-linux-x64.tar.gz"
-          rm "dart-sass-${DART_SASS_VERSION}-linux-x64.tar.gz"
-          echo "${HOME}/.local/dart-sass" >> "${GITHUB_PATH}"
+
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
         with:
-          hugo-version: 'latest'
+          hugo-version: ${{ env.HUGO_VERSION }}
           extended: true
+
       - name: Verify installations
         run: |
-          echo "Dart Sass: $(sass --version)"
-          echo "Go: $(go version)"
           echo "Hugo: $(hugo version)"
-          echo "Node.js: $(node --version)"
-      - name: Install Node.js dependencies
-        run: |
-          [[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci || true
-      - name: Configure Git
-        run: |
-          git config core.quotepath false
-      - name: Cache restore
-        id: cache-restore
-        uses: actions/cache/restore@v5
-        with:
-          path: ${{ runner.temp }}/hugo_cache
-          key: hugo-${{ github.run_id }}
-          restore-keys:
-            hugo-
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v6
+
       - name: Build the site
         run: |
           hugo \
             --gc \
             --minify \
-            --baseURL "${{ steps.pages.outputs.base_url }}/" \
-            --cacheDir "${{ runner.temp }}/hugo_cache"
-      - name: Cache save
-        id: cache-save
-        uses: actions/cache/save@v5
-        with:
-          path: ${{ runner.temp }}/hugo_cache
-          key: ${{ steps.cache-restore.outputs.cache-primary-key }}
+            --baseURL "${{ steps.pages.outputs.base_url }}/"
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
           path: ./public
+
   deploy:
     environment:
       name: github-pages
@@ -103,3 +69,83 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+  # Bing 收录推送（IndexNow 免账号方案）：部署完成后拉取线上 sitemap，
+  # 把全部 URL 提交给 api.indexnow.org（必应等参与搜索引擎共享推送）。
+  # key 文件为 static/92245a642338954199d4b6a48196c5ad.txt（内容=文件名），
+  # 须随站部署、能从 https://www.kukie.cn/92245a642338954199d4b6a48196c5ad.txt 公开访问；
+  # 更换域名或重新生成 key 时，请同步修改下方 SITE_BASE / INDEXNOW_KEY 与 static/ 下文件。
+  submit-indexnow:
+    name: Bing 收录推送 (IndexNow)
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Push URLs to IndexNow
+        env:
+          SITE_BASE: 'https://www.kukie.cn'
+          INDEXNOW_KEY: '92245a642338954199d4b6a48196c5ad'
+        run: |
+          set -euo pipefail
+          BASE_URL="$SITE_BASE"
+          KEY="$INDEXNOW_KEY"
+
+          # 部署完成到线上可访问有短暂延迟，最多重试 5 次（每次间隔 5s）
+          for attempt in 1 2 3 4 5; do
+            if curl -fsS -o /tmp/sitemap.xml "$BASE_URL/sitemap.xml"; then
+              echo "已获取线上 sitemap: $BASE_URL/sitemap.xml"
+              break
+            fi
+            if [ "$attempt" -eq 5 ]; then
+              echo "::warning::线上 sitemap 拉取失败（$BASE_URL/sitemap.xml），跳过本次 IndexNow 推送"
+              exit 0
+            fi
+            sleep 5
+          done
+
+          python3 - <<'PY'
+          import json, os, sys, urllib.error, urllib.request
+          import xml.etree.ElementTree as ET
+          from urllib.parse import urlparse
+
+          base = os.environ["SITE_BASE"].rstrip("/")
+          key = os.environ["INDEXNOW_KEY"]
+
+          tree = ET.parse("/tmp/sitemap.xml")
+          paths, seen = [], set()
+          for node in tree.iter():
+              if not node.tag.endswith("loc") or not node.text:
+                  continue
+              path = urlparse(node.text.strip()).path or "/"
+              if path not in seen:
+                  seen.add(path)
+                  paths.append(path)
+          if not paths:
+              print("::warning::线上 sitemap 中没有可推送的 URL，跳过 IndexNow 推送")
+              sys.exit(0)
+          if len(paths) > 10000:
+              print(f"::warning::URL 共 {len(paths)} 条，超过单次上限，仅推送前 10000 条")
+              paths = paths[:10000]
+          urls = [base + path for path in paths]
+          host = urlparse(base).netloc
+
+          payload = {
+              "host": host,
+              "key": key,
+              "keyLocation": f"{base}/{key}.txt",
+              "urlList": urls,
+          }
+          req = urllib.request.Request(
+              "https://api.indexnow.org/indexnow",
+              data=json.dumps(payload).encode("utf-8"),
+              headers={"Content-Type": "application/json; charset=utf-8"},
+              method="POST",
+          )
+          try:
+              with urllib.request.urlopen(req, timeout=30) as resp:
+                  print(f"IndexNow HTTP {resp.status}（OK）：已提交 {len(urls)} 条 URL")
+          except urllib.error.HTTPError as e:
+              print(f"::error::IndexNow 返回 HTTP {e.code}: {e.read().decode('utf-8', 'replace')}")
+              sys.exit(1)
+          except Exception as e:
+              print(f"::warning::IndexNow 请求异常（部署不受影响）：{e}")
+          PY

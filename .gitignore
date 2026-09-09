@@ -1,5 +1,9 @@
-public
-resources
+/public/
+/resources/_gen/
 .hugo_build.lock
+node_modules/
 .DS_Store
-assets/jsconfig.json
+Thumbs.db
+/content/.obsidian
+/data/links_rss.json
+/data/bangumi.json

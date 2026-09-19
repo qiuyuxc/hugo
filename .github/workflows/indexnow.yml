@@ -1,0 +1,170 @@
+name: IndexNow 收录推送
+
+# 说明
+# ---------------------------------------------------------------------------
+# 本站实际部署渠道是 Cloudflare Pages / Netlify（见 wrangler.toml、netlify.toml），
+# 本仓库并未启用 GitHub Pages（has_pages = false）。
+# 原先的 "Build and deploy" 工作流里 build / deploy 两个 job 每次都在
+# actions/configure-pages 处失败，连带依赖它的 IndexNow 推送被永久跳过。
+# 因此这里移除了那两个 job，只保留 Bing 收录推送（IndexNow）。
+# ---------------------------------------------------------------------------
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: indexnow
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  submit-indexnow:
+    name: Bing 收录推送 (IndexNow)
+    runs-on: ubuntu-latest
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: 等待部署完成并推送 URL
+        env:
+          SITE_BASE: 'https://www.kukie.cn'
+          INDEXNOW_KEY: '92245a642338954199d4b6a48196c5ad'
+          BEFORE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+
+          BASE_URL="${SITE_BASE%/}"
+          KEY="$INDEXNOW_KEY"
+          MAX_WAIT=40     # 最多轮询 40 次
+          INTERVAL=15     # 每次间隔 15s，最长约 10 分钟
+
+          # ---- 1. 从本次推送的改动里推导受影响的文章 URL --------------------
+          urls=""
+          if [ "$EVENT_NAME" = "push" ] && [ -n "${BEFORE_SHA:-}" ] \
+             && [ "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ]; then
+            changed=$(git diff --name-only --diff-filter=AM "$BEFORE_SHA" "$HEAD_SHA" -- 'content/posts' || true)
+            while IFS= read -r f; do
+              [ -n "$f" ] || continue
+              case "$f" in *.md) ;; *) continue ;; esac
+              rel="${f#content/posts/}"
+              rel="${rel%.md}"
+              rel="${rel%/index}"        # page bundle：xxx/index.md -> xxx
+              urls="${urls}${BASE_URL}/posts/${rel}/"$'\n'
+            done <<< "$changed"
+          fi
+          urls=$(printf '%s' "$urls" | sed '/^$/d' | sort -u || true)
+
+          # ---- 2. 等这些 URL 真的能打开，确认线上部署已经完成 ----------------
+          # 直接探测页面比探测 sitemap 可靠：sitemap 会长期返回 200（旧版本），
+          # 而页面只有在新构建发布后才会出现，能真正代表"部署完成"。
+          if [ -n "$urls" ]; then
+            echo "本次推送涉及以下 URL："
+            printf '  %s\n' $urls
+            echo "等待线上部署完成..."
+            while IFS= read -r u; do
+              [ -n "$u" ] || continue
+              ok=0
+              for i in $(seq 1 "$MAX_WAIT"); do
+                code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "$u" || echo 000)
+                if [ "$code" = "200" ]; then
+                  echo "  [$i] $u -> 200 ✓"
+                  ok=1
+                  break
+                fi
+                echo "  [$i/$MAX_WAIT] $u -> $code，继续等待..."
+                sleep "$INTERVAL"
+              done
+              if [ "$ok" -ne 1 ]; then
+                echo "::warning::$u 在 $((MAX_WAIT * INTERVAL))s 内未返回 200，本次跳过该 URL"
+                urls=$(printf '%s\n' "$urls" | grep -vxF "$u" || true)
+              fi
+            done <<< "$urls"
+          fi
+
+          # ---- 3. 兜底：没有可用 URL 时，退化为推送线上 sitemap 全量 ----------
+          if [ -z "$urls" ]; then
+            echo "没有可用的改动 URL（可能是手动触发或非文章改动），退化为推送 sitemap 全量。"
+            sitemap_ok=0
+            for attempt in 1 2 3 4 5; do
+              if curl -fsS -o /tmp/sitemap.xml "$BASE_URL/sitemap.xml"; then
+                echo "已获取线上 sitemap"
+                sitemap_ok=1
+                break
+              fi
+              [ "$attempt" -eq 5 ] && break
+              sleep 5
+            done
+            if [ "$sitemap_ok" -ne 1 ]; then
+              echo "::warning::线上 sitemap 拉取失败（$BASE_URL/sitemap.xml），跳过本次 IndexNow 推送"
+              exit 0
+            fi
+            urls=$(python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          from urllib.parse import urlparse
+          tree = ET.parse("/tmp/sitemap.xml")
+          out = []
+          for node in tree.iter():
+              if node.tag.endswith("loc") and node.text:
+                  u = node.text.strip()
+                  if urlparse(u).path not in ("", "/"):
+                      out.append(u)
+          print("\n".join(dict.fromkeys(out)))
+          PY
+          )
+          fi
+
+          if [ -z "$urls" ]; then
+            echo "::warning::没有可推送的 URL，跳过 IndexNow 推送"
+            exit 0
+          fi
+
+          count=$(printf '%s\n' "$urls" | sed '/^$/d' | wc -l | tr -d ' ')
+          if [ "$count" -gt 10000 ]; then
+            echo "::warning::URL 共 $count 条，超过单次上限，仅推送前 10000 条"
+            urls=$(printf '%s\n' "$urls" | sed '/^$/d' | head -10000)
+            count=10000
+          fi
+
+          # ---- 4. 提交给 IndexNow ------------------------------------------
+          host=$(echo "$BASE_URL" | sed -E 's|^https?://([^/]+).*|\1|')
+          export IDXN_URLS="$urls" IDXN_HOST="$host" IDXN_KEY="$KEY" IDXN_BASE="$BASE_URL"
+          python3 - <<'PY'
+          import json, os, sys, urllib.error, urllib.request
+          urls = [u for u in os.environ["IDXN_URLS"].splitlines() if u.strip()]
+          payload = {
+              "host": os.environ["IDXN_HOST"],
+              "key": os.environ["IDXN_KEY"],
+              "keyLocation": f'{os.environ["IDXN_BASE"]}/{os.environ["IDXN_KEY"]}.txt',
+              "urlList": urls,
+          }
+          req = urllib.request.Request(
+              "https://api.indexnow.org/indexnow",
+              data=json.dumps(payload).encode("utf-8"),
+              headers={"Content-Type": "application/json; charset=utf-8"},
+              method="POST",
+          )
+          try:
+              with urllib.request.urlopen(req, timeout=30) as resp:
+                  print(f"IndexNow HTTP {resp.status}（OK）：已提交 {len(urls)} 条 URL")
+          except urllib.error.HTTPError as e:
+              print(f"::error::IndexNow 返回 HTTP {e.code}: {e.read().decode('utf-8', 'replace')}")
+              sys.exit(1)
+          except Exception as e:
+              print(f"::warning::IndexNow 请求异常（部署不受影响）：{e}")
+          PY

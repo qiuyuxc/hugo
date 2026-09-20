@@ -18,6 +18,7 @@
 | `static/favicon.png` / `static/favicon.ico` | 网站图标 |
 | `themes/aiovtue/` | 主题本体（随仓库 vendored，非 git submodule） |
 | `layouts/partials/head.html` | 站点级 `<head>` 覆盖（已加入 Umami 统计，同步主题更新时留意） |
+| `assets/css/site-banner.css` `assets/js/site-banner.js` `layouts/partials/site-banner.html` | 站点顶栏公告（动态，见下文） |
 | `.github/workflows/deploy.yml` | GitHub Pages 自动部署 |
 
 ## 本地开发
@@ -85,6 +86,46 @@ visitorEnable = false   # 需要文章阅读量时改为 true
 
 - **Umami**：纯埋点统计（`layouts/partials/head.html` 站点级覆盖，脚本位于 `um.kukie.cn`），与页面显示的数字无关。
 - 页脚「今日访客 / 今日访问 / 本站访客 / 本站访问」由主题内置的第三方 **不蒜子 busuanzi**（`cdn.busuanzi.cc`）提供，按用户要求保留原样。
+
+## 站点公告（动态）
+
+站点顶部有一条公告栏，**内容在页面加载后从后端拉取**，因此：
+
+- **改公告内容不需要走构建** —— 更新那个 JSON 文件即可，刷新页面就生效；
+- 只有改配置（端点、开关）才需要重新构建一次。
+
+配置在 `hugo.toml` 的 `[params.siteBanner]`：
+
+```toml
+[params.siteBanner]
+  enable = true
+  endpoint = 'https://cloud.kukie.cn/d/M/notice.json?sign=...'
+  timeoutMs = 5000
+```
+
+**端点建议用环境变量覆盖，不必改仓库**（CF Pages → Settings → Environment Variables）：
+
+```
+HUGO_PARAMS_SITEBANNER_ENDPOINT=https://...
+```
+
+Hugo 会自动用它覆盖 `hugo.toml` 里的值；改完在 Pages 上 Retry deployment 即可。
+
+JSON 字段（`text` 之外都可选）：
+
+| 字段 | 说明 |
+|------|------|
+| `enabled` | `false` 时不显示（相当于下线公告） |
+| `level` | `info` / `warn` / `ok`，三种配色 |
+| `badge` | 左侧标签文字，默认「公告」 |
+| `text` | 正文；超过两行折叠，右侧出现「展开」 |
+| `link` | 有值时正文可点击 |
+| `external` | `true` 则新窗口打开 |
+| `updated` | 版本号；未填写时自动用响应的 `Last-Modified` |
+
+行为：拉取失败 / 超时（5 秒）/ 字段缺失一律**静默不显示**，不影响页面；点 ✕ 关闭后按版本号记忆，**同一条不再打扰，内容更新会重新出现**。
+
+实现：`assets/js/site-banner.js`（拉取与渲染）、`assets/css/site-banner.css`（样式，取自主题 CSS 变量，自动适配暗色）、`layouts/partials/site-banner.html`（输出 meta 并引入资源）。
 
 ## 部署
 

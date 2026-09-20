@@ -417,6 +417,18 @@ enableRobotsTXT = true     # 生成 robots.txt（模板在 themes/aiovtue/layout
     zIndex = 5                                      # 层级，需低于弹窗/导航
     script = '/vendor/yzhanweather/yzhanweather.min.js'
 
+  # --- 站点顶栏公告（动态）---
+  # 页面加载后从 endpoint 拉一份 JSON 渲染顶栏。
+  # 改公告内容：只需更新那个 JSON 文件，不必走构建。改本文件里的配置才需要重新构建。
+  # 端点建议用环境变量覆盖，无需改仓库：HUGO_PARAMS_SITEBANNER_ENDPOINT
+  # （CF Pages → Settings → Environment variables，改完 Retry deployment）
+  # JSON 字段：enabled / level(info|warn|ok) / badge / text / link / external / updated
+  # enable = false 可整站关闭；endpoint 留空则不输出任何标记。
+  [params.siteBanner]
+    enable = true
+    endpoint = 'https://cloud.kukie.cn/d/M/notice.json?sign=OsjEhKhHOJ-NK8x6_csPGOQYdL5dfWCXcbyE0G6Wk8I=:0'
+    timeoutMs = 5000
+
   # --- 站内无刷新跳转（PJAX）---
   [params.pjax]
     enable = true

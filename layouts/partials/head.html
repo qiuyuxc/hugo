@@ -70,6 +70,7 @@
 <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" crossorigin="anonymous">
 {{- partial "hero-grid-style.html" . -}}
 {{- partial "page-styles.html" . -}}
+{{- partial "site-banner.html" . -}}
 {{ block "head-extra" . }}{{ end }}
 {{- if or (.Store.Get "hasMath") (and .Params.math (or (eq .Section "posts") (eq .Layout "about"))) -}}
 <link rel="stylesheet" href="{{ "katex/katex.min.css" | relURL }}">

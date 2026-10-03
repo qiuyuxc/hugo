@@ -265,11 +265,57 @@ export function initPostImageRows() {
   })
 }
 
+export function initMobilePostToc() {
+  const root = document.querySelector('[data-mobile-toc]')
+  const source = document.querySelector('.sakura-post-toc .sakura-toc__nav')
+  const trigger = root?.querySelector('.sakura-mobile-toc__trigger')
+  const panel = root?.querySelector('.sakura-mobile-toc__panel')
+  if (!root || !source || !trigger || !panel || panel.childElementCount) return
+
+  const nav = source.cloneNode(true)
+  nav.querySelector('#TableOfContents')?.removeAttribute('id')
+  panel.appendChild(nav)
+
+  const close = () => {
+    root.classList.remove('is-open')
+    trigger.setAttribute('aria-expanded', 'false')
+    trigger.setAttribute('aria-label', '打开文章目录')
+    panel.hidden = true
+  }
+  const toggle = () => {
+    const open = !root.classList.contains('is-open')
+    root.classList.toggle('is-open', open)
+    trigger.setAttribute('aria-expanded', String(open))
+    trigger.setAttribute('aria-label', open ? '关闭文章目录' : '打开文章目录')
+    panel.hidden = !open
+  }
+  const onKeydown = (event) => {
+    if (event.key === 'Escape') close()
+  }
+  const onPointerdown = (event) => {
+    if (root.classList.contains('is-open') && !root.contains(event.target)) close()
+  }
+
+  trigger.addEventListener('click', toggle)
+  panel.addEventListener('click', (event) => {
+    if (event.target.closest('a[href^="#"]')) close()
+  })
+  document.addEventListener('keydown', onKeydown)
+  document.addEventListener('pointerdown', onPointerdown)
+  registerPageCleanup(() => {
+    trigger.removeEventListener('click', toggle)
+    document.removeEventListener('keydown', onKeydown)
+    document.removeEventListener('pointerdown', onPointerdown)
+  })
+}
+
 export function initPostToc() {
   const aside = document.querySelector('.sakura-post-toc')
   const inner = aside?.querySelector('.sakura-toc__inner')
   const marker = aside?.querySelector('.outline-marker')
   const links = inner ? [...inner.querySelectorAll('#TableOfContents a[href^="#"]')] : []
+  const mobileLinks = [...document.querySelectorAll('.sakura-mobile-toc__panel a[href^="#"]')]
+  const allLinks = [...links, ...mobileLinks]
   if (!aside || !inner || !links.length) return
 
   const navHeight = () => getNavbarLayoutOffset()
@@ -280,7 +326,8 @@ export function initPostToc() {
   }).filter(Boolean)
 
   const setActive = (activeLink) => {
-    links.forEach((link) => link.classList.toggle('active', link === activeLink))
+    const href = activeLink?.getAttribute('href')
+    allLinks.forEach((link) => link.classList.toggle('active', link.getAttribute('href') === href))
     if (!marker || !activeLink) return
     const innerRect = inner.getBoundingClientRect()
     const linkRect = activeLink.getBoundingClientRect()
@@ -299,7 +346,7 @@ export function initPostToc() {
     setActive(current)
   }
 
-  links.forEach((link) => {
+  allLinks.forEach((link) => {
     link.addEventListener('click', (event) => {
       event.preventDefault()
       const id = decodeURIComponent(link.getAttribute('href').slice(1))

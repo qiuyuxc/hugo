@@ -38,9 +38,17 @@ function scheduleSiteEffectsInitLazy() {
     .catch((err) => console.warn('[site-effects]', err))
 }
 
+function syncThemeToggle(isDark) {
+  const button = document.getElementById('theme-toggle')
+  const icon = button?.querySelector('iconify-icon')
+  if (icon) icon.setAttribute('icon', isDark ? 'ri:sun-line' : 'ri:moon-line')
+  button?.setAttribute('aria-label', isDark ? '切换到日间模式' : '切换到夜间模式')
+}
+
 function applyTheme(root, isDark) {
   root.classList.toggle('dark', isDark)
   localStorage.setItem('sakura-theme', isDark ? 'dark' : 'light')
+  syncThemeToggle(isDark)
 }
 
 function getThemeToggleOrigin(event) {
@@ -111,6 +119,7 @@ export function bootShell({ mountPage, unmountPage }) {
   } else {
     root.classList.remove('dark')
   }
+  syncThemeToggle(root.classList.contains('dark'))
 
   document.getElementById('theme-toggle')?.addEventListener('click', (event) => {
     toggleTheme(event)

@@ -23,6 +23,12 @@
     <aside class="sakura-aside sakura-post-toc">
       {{- partial "toc.html" . -}}
     </aside>
+    <div class="sakura-mobile-toc" data-mobile-toc>
+      <button class="sakura-mobile-toc__trigger" type="button" aria-expanded="false" aria-controls="mobile-post-toc" aria-label="打开文章目录">
+        <span aria-hidden="true">▸</span><span class="sakura-mobile-toc__label">目录</span>
+      </button>
+      <section class="sakura-mobile-toc__panel" id="mobile-post-toc" aria-label="文章目录" hidden></section>
+    </div>
     {{ end }}
   </div>
 </article>

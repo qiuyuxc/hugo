@@ -6037,3 +6037,39 @@ html.dark .not-found {
   text-shadow: 0 5px 10px rgba(0, 0, 0, 0.45), 0 20px 20px rgba(0, 0, 0, 0.35);
 }
 
+/* 移动端文章目录：右侧收起标签，避免占用正文宽度。 */
+.sakura-mobile-toc { display: none; }
+
+@media (max-width: 768px) {
+  .sakura-mobile-toc { display: block; position: fixed; z-index: 40; top: 50%; right: 0; }
+
+  .sakura-mobile-toc__trigger {
+    display: flex; align-items: center; gap: 2px; min-height: 62px; padding: 8px 6px 8px 7px;
+    border: 1px solid color-mix(in srgb, var(--va-c-border, #d9ddd6) 85%, transparent); border-right: 0;
+    border-radius: 10px 0 0 10px; background: color-mix(in srgb, var(--va-c-bg-soft, #f8f7f2) 92%, transparent);
+    box-shadow: 0 4px 16px rgba(36, 54, 44, .12); color: var(--va-c-text, #273b31);
+    font: inherit; cursor: pointer; transform: translateY(-50%); -webkit-tap-highlight-color: transparent;
+  }
+  .sakura-mobile-toc__trigger > span:first-child { display: inline-block; font-size: 14px; transition: transform .2s ease; }
+  .sakura-mobile-toc__label { writing-mode: vertical-rl; font-size: 11px; letter-spacing: 2px; }
+  .sakura-mobile-toc.is-open .sakura-mobile-toc__trigger > span:first-child { transform: rotate(180deg); }
+
+  .sakura-mobile-toc__panel {
+    position: absolute; right: 10px; bottom: calc(50% - 31px); width: calc(100vw - 44px); max-width: 290px;
+    max-height: 58vh; overflow: auto; padding: 18px 16px;
+    border: 1px solid color-mix(in srgb, var(--va-c-border, #d9ddd6) 90%, transparent); border-radius: 12px;
+    background: var(--va-c-bg-soft, #f8f7f2); box-shadow: 0 12px 32px rgba(36, 54, 44, .18); overscroll-behavior: contain;
+  }
+  .sakura-mobile-toc__panel .sakura-toc__nav ul { margin: 0; padding: 0; list-style: none; }
+  .sakura-mobile-toc__panel .sakura-toc__nav ul ul { padding-left: 14px; }
+  .sakura-mobile-toc__panel .sakura-toc__nav li + li { margin-top: 3px; }
+  .sakura-mobile-toc__panel .sakura-toc__nav a {
+    display: block; padding: 8px 7px; border-radius: 6px; color: var(--va-c-text, #273b31);
+    font-size: 13px; line-height: 1.45; text-decoration: none;
+  }
+  .sakura-mobile-toc__panel .sakura-toc__nav a.active {
+    background: color-mix(in srgb, var(--va-c-primary, #315644) 12%, transparent);
+    color: var(--va-c-primary, #315644); font-weight: 600;
+  }
+}
+

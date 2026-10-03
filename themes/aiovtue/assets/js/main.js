@@ -10,6 +10,7 @@ import {
   initMarkdownCodeBlocks,
   initPostSponsor,
   initPostImageRows,
+  initMobilePostToc,
   initPostToc,
   initPostAiSummary,
   initAlbumPasswordGate,
@@ -78,6 +79,7 @@ function mountPage() {
   initHomeCardsLoadMore()
   scheduleHomeCardsLoadMoreSync()
   initWeeklyLoadMore()
+  initMobilePostToc()
   initPostToc()
   initPageComments({
     onTwikooReady: () => {

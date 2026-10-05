@@ -175,10 +175,19 @@ enableRobotsTXT = true     # 生成 robots.txt（模板在 themes/aiovtue/layout
     since = 2024           # 版权起始年
     runtimeSince = '2024-01-01'   # 站点运行倒计时起点（YYYY-MM-DD）
     icp = ''
-    # 页脚展示当前 CDN 徽章（浏览器端同源读取响应头 Server）
+    # 页脚展示各服务当前 CDN（浏览器端读取响应头 Server；跨域需目标暴露 Server 头）
     [params.footer.serverInfo]
       enable = true
-      label = '当前 CDN'
+      # url 留空表示当前站点
+      [[params.footer.serverInfo.entries]]
+        text = '站点'
+        url = ''
+      [[params.footer.serverInfo.entries]]
+        text = '存储'
+        url = 'https://cdn.kukie.cn/'
+      [[params.footer.serverInfo.entries]]
+        text = '评论'
+        url = 'https://tw.kukie.cn/'
 
 # --- 首页公告栏（右侧域名列表）---
   # --- 首页文章列表布局 ---

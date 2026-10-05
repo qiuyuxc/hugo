@@ -17,39 +17,7 @@
     <p class="sakura-footer-powered">
       Powered by <a href="https://github.com/gohugoio/hugo" target="_blank" class="sakura-footer-powered__link">hugo</a> & theme <a href="https://github.com/AIOVTUE/hugo-theme-aiovtue" target="_blank" class="sakura-footer-powered__link">AIOVTUE</a>
     </p>
-
-    <p class="sakura-footer-busuanzi">
-      <span class="sakura-footer-busuanzi__row">
-        <span>今日访客：<span id="busuanzi_today_uv">加载中...</span></span>
-        <span class="sakura-footer-busuanzi__sep">|</span>
-        <span>今日访问：<span id="busuanzi_today_pv">加载中...</span></span>
-      </span>
-      <span class="sakura-footer-busuanzi__sep sakura-footer-busuanzi__sep--desktop">|</span>
-      <span class="sakura-footer-busuanzi__row">
-        <span>本站访客：<span id="busuanzi_site_uv">加载中...</span></span>
-        <span class="sakura-footer-busuanzi__sep">|</span>
-        <span>本站访问：<span id="busuanzi_site_pv">加载中...</span></span>
-      </span>
-    </p>
   </div>
-
-  {{ with .Site.Params.footer.runtimeSince }}
-
-  <p class="sakura-footer-runtime" id="site-runtime" data-since="{{ . }}">
-
-    本站已经流畅运行
-
-    <span class="sakura-footer-runtime__num" data-unit="days">0</span>天
-
-    <span class="sakura-footer-runtime__num" data-unit="hours">0</span>小时
-
-    <span class="sakura-footer-runtime__num" data-unit="minutes">0</span>分钟
-
-    <span class="sakura-footer-runtime__num" data-unit="seconds">0</span>秒
-
-  </p>
-
-  {{ end }}
 
   <div class="sakura-copyright">
 

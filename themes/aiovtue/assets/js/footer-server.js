@@ -3,8 +3,12 @@
    新增 CDN：往 CDN_BADGES 里加一条即可（icon 放 static/cdn/ 下）。 */
 const CDN_BADGES = [
   { match: ['cloudflare'], icon: '/cdn/cf.svg', name: 'Cloudflare' },
-  { match: ['edgeone', 'tencent'], icon: '/cdn/eo.svg', name: 'EdgeOne' },
-  { match: ['tengine', 'esa', 'aliyun', 'alibabacloud'], icon: '/cdn/esa.svg', name: 'Alibaba Cloud' },
+  { match: ['edgeone'], icon: '/cdn/eo.svg', name: 'EdgeOne' },
+  { match: ['tengine', 'aliyun', 'alibabacloud'], icon: '/cdn/aliyun-cdn.svg', name: 'Alibaba Cloud' },
+  { match: ['esa'], icon: '/cdn/esa.svg', name: 'Alibaba ESA' },
+  { match: ['tencent'], icon: '/cdn/tencent-cdn.svg', name: 'Tencent Cloud' },
+  { match: ['wangsu', 'chinanetcenter'], icon: '/cdn/wangsu.svg', name: 'Wangsu' },
+  { match: ['upyun'], icon: '/cdn/upyun.svg', name: 'Upyun' },
 ]
 
 let serverHeaderPromise = null

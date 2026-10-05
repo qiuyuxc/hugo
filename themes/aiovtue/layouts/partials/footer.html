@@ -20,7 +20,7 @@
 
     {{ with .Site.Params.footer.serverInfo }}
     {{ if .enable }}
-    <div class="sakura-footer-server" id="footer-server" hidden>
+    <div class="sakura-footer-server" id="footer-server" hidden data-asn-fallback="{{ if .asnFallback }}1{{ else }}0{{ end }}">
       {{ range .entries }}
       <div class="sakura-footer-server__item" data-server-url="{{ .url }}" data-server-cdn="{{ .cdn }}">
         <span class="sakura-footer-server__label">{{ .text }}：</span>

@@ -72,7 +72,7 @@ async function lookupCdnByAsn(host) {
   return lookupAsnInfo(ip)
 }
 
-function resolveCdnValue(url) {
+function resolveCdnValue(url, asnFallback) {
   const key = url || window.location.href
   if (!cdnValueCache.has(key)) {
     cdnValueCache.set(
@@ -80,6 +80,7 @@ function resolveCdnValue(url) {
       (async () => {
         const server = await fetchServerHeader(key)
         if (server) return server
+        if (!asnFallback) return null
         let host = window.location.hostname
         if (url) {
           try { host = new URL(url).hostname } catch {}
@@ -114,6 +115,7 @@ export function initFooterServer() {
   if (!items.length) return
 
   const override = readServerOverride()
+  const asnFallback = container.dataset.asnFallback === '1'
 
   Promise.all(
     items.map((item) => {
@@ -122,7 +124,7 @@ export function initFooterServer() {
       let serverPromise
       if (manual) serverPromise = Promise.resolve(manual)
       else if (override && !url) serverPromise = Promise.resolve(override)
-      else serverPromise = resolveCdnValue(url)
+      else serverPromise = resolveCdnValue(url, asnFallback)
       return serverPromise.then((server) => ({ item, server }))
     }),
   ).then((results) => {

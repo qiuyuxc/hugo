@@ -178,6 +178,8 @@ enableRobotsTXT = true     # 生成 robots.txt（模板在 themes/aiovtue/layout
     # 页脚展示各服务当前 CDN（优先读响应头 Server，读不到时按 IP 归属 ASN 兜底）
     [params.footer.serverInfo]
       enable = true
+      # asnFallback：读不到 Server 头时，是否用 IP 归属(ASN)兜底识别 CDN（默认关）
+      asnFallback = false
       # url 留空表示当前站点
       # cdn 可选：手动指定（匹配 CDN_BADGES 的键，如 cloudflare），跨域读不到 Server 头时用
       [[params.footer.serverInfo.entries]]
@@ -189,6 +191,7 @@ enableRobotsTXT = true     # 生成 robots.txt（模板在 themes/aiovtue/layout
       [[params.footer.serverInfo.entries]]
         text = '评论'
         url = 'https://tw.kukie.cn/'
+        cdn = 'cloudflare'
 
 # --- 首页公告栏（右侧域名列表）---
   # --- 首页文章列表布局 ---

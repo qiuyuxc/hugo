@@ -1,7 +1,6 @@
 
 import { cleanupPageComments, initPageComments, initTwikooVisitors } from './comments.js'
 import { runPageCleanups } from './page-cleanup.js'
-import { initKukieComments } from './kukie-comments.js'
 import { bootShell, bindCopyYmlBtn } from './shell.js'
 import { updateSidebarNavActive } from './sidebar.js'
 import { refreshHomeNavbar, refreshMobileNavbarCollapse, refreshDesktopNavbarCollapse } from './navbar.js'
@@ -84,7 +83,6 @@ function mountPage() {
   initWeeklyLoadMore()
   initMobilePostToc()
   initPostToc()
-  initKukieComments()
   initPageComments({
     onTwikooReady: () => {
       customizeTwikooCommentForm()

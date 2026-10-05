@@ -1,6 +1,7 @@
 
 import { cleanupPageComments, initPageComments, initTwikooVisitors } from './comments.js'
 import { runPageCleanups } from './page-cleanup.js'
+import { initKukieComments } from './kukie-comments.js'
 import { bootShell, bindCopyYmlBtn } from './shell.js'
 import { updateSidebarNavActive } from './sidebar.js'
 import { refreshHomeNavbar, refreshMobileNavbarCollapse, refreshDesktopNavbarCollapse } from './navbar.js'
@@ -17,6 +18,7 @@ import {
 } from './post-content.js'
 import { initNoticeBoard } from './notice-board.js'
 import { initSiteRuntime } from './site-runtime.js'
+import { initFooterServer } from './footer-server.js'
 import {
   initHomeLayoutRandom,
   initHomePaginationScroll,
@@ -68,6 +70,7 @@ function mountPage() {
   bindHeroScrollDown()
   initNoticeBoard()
   initSiteRuntime()
+  initFooterServer()
   initHomeLayoutRandom()
   initHomePaginationScroll()
   initHomePostListScrollAnimation()
@@ -81,6 +84,7 @@ function mountPage() {
   initWeeklyLoadMore()
   initMobilePostToc()
   initPostToc()
+  initKukieComments()
   initPageComments({
     onTwikooReady: () => {
       customizeTwikooCommentForm()

@@ -17,6 +17,16 @@
     <p class="sakura-footer-powered">
       Powered by <a href="https://github.com/gohugoio/hugo" target="_blank" class="sakura-footer-powered__link">hugo</a> & theme <a href="https://github.com/AIOVTUE/hugo-theme-aiovtue" target="_blank" class="sakura-footer-powered__link">AIOVTUE</a>
     </p>
+
+    {{ with .Site.Params.footer.serverInfo }}
+    {{ if .enable }}
+    <div class="sakura-footer-server" id="footer-server" hidden>
+      {{ with .label }}<span class="sakura-footer-server__label">{{ . }}：</span>{{ end }}
+      <span class="sakura-footer-server__value" data-server-value>检测中…</span>
+      <img class="sakura-footer-server__icon" data-server-icon alt="" hidden>
+    </div>
+    {{ end }}
+    {{ end }}
   </div>
 
   <div class="sakura-copyright">

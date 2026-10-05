@@ -3880,6 +3880,25 @@ html.dark .sakura-copyright-signature {
   display: flex;
   flex-direction: column;
 }
+.sakura-footer-server {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0;
+  padding: 2px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: var(--sakura-color-text-muted);
+}
+.sakura-footer-server[hidden] {
+  display: none;
+}
+.sakura-footer-server__icon {
+  height: 18px;
+  width: auto;
+  display: block;
+}
 @media (max-width: 768px) {
   .sakura-footer-meta {
     flex-direction: column-reverse;

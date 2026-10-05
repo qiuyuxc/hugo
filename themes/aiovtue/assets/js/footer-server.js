@@ -60,7 +60,11 @@ export function initFooterServer() {
   Promise.all(
     items.map((item) => {
       const url = item.dataset.serverUrl || ''
-      const serverPromise = override && !url ? Promise.resolve(override) : fetchServerHeader(url)
+      const manual = (item.dataset.serverCdn || '').trim()
+      let serverPromise
+      if (manual) serverPromise = Promise.resolve(manual)
+      else if (override && !url) serverPromise = Promise.resolve(override)
+      else serverPromise = fetchServerHeader(url)
       return serverPromise.then((server) => ({ item, server }))
     }),
   ).then((results) => {

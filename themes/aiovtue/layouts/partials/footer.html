@@ -22,7 +22,7 @@
     {{ if .enable }}
     <div class="sakura-footer-server" id="footer-server" hidden>
       {{ range .entries }}
-      <div class="sakura-footer-server__item" data-server-url="{{ .url }}">
+      <div class="sakura-footer-server__item" data-server-url="{{ .url }}" data-server-cdn="{{ .cdn }}">
         <span class="sakura-footer-server__label">{{ .text }}：</span>
         <span class="sakura-footer-server__value" data-server-value>检测中…</span>
         <img class="sakura-footer-server__icon" data-server-icon alt="" hidden>

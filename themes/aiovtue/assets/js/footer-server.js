@@ -28,6 +28,22 @@ function fetchServerHeader() {
   return serverHeaderPromise
 }
 
+/* 本地预览开关：访问 ?cdn=aliyun 强制显示指定徽章并记住；?cdn=off 关闭。
+   仅用于本地看效果，线上正常走 Server 头。 */
+function readServerOverride() {
+  let params
+  try { params = new URLSearchParams(window.location.search) } catch { return null }
+  if (params.has('cdn')) {
+    const value = params.get('cdn')
+    try {
+      if (!value || value === 'off') localStorage.removeItem('cdn-preview')
+      else localStorage.setItem('cdn-preview', value)
+    } catch {}
+    return value && value !== 'off' ? value : null
+  }
+  try { return localStorage.getItem('cdn-preview') || null } catch { return null }
+}
+
 export function initFooterServer() {
   const container = document.getElementById('footer-server')
   if (!container || container.dataset.ready === '1') return
@@ -35,7 +51,10 @@ export function initFooterServer() {
   const valueEl = container.querySelector('[data-server-value]')
   const iconEl = container.querySelector('[data-server-icon]')
 
-  fetchServerHeader().then((server) => {
+  const override = readServerOverride()
+  const serverPromise = override ? Promise.resolve(override) : fetchServerHeader()
+
+  serverPromise.then((server) => {
     const badge = matchBadge(server)
     if (badge) {
       iconEl.src = badge.icon

@@ -7,8 +7,6 @@ const CDN_BADGES = [
   { match: ['tengine', 'aliyun', 'alibabacloud'], icon: '/cdn/aliyun-cdn.svg', name: 'Alibaba Cloud' },
   { match: ['esa'], icon: '/cdn/esa.svg', name: 'Alibaba ESA' },
   { match: ['tencent'], icon: '/cdn/tencent-cdn.svg', name: 'Tencent Cloud' },
-  { match: ['wangsu', 'chinanetcenter'], icon: '/cdn/wangsu.svg', name: 'Wangsu' },
-  { match: ['upyun'], icon: '/cdn/upyun.svg', name: 'Upyun' },
 ]
 
 let serverHeaderPromise = null

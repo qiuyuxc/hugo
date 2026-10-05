@@ -3876,61 +3876,13 @@ html.dark .sakura-copyright-signature {
 }
 .sakura-copyright-author {
 }
-.sakura-footer-runtime {
-  margin: 0;
-  padding: 2px 0;
-  font-size: 0.875rem;
-  line-height: 1.35;
-  color: var(--sakura-color-text-muted);
-}
-.sakura-footer-runtime__num {
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  color: var(--sakura-color-primary);
-}
 .sakura-footer-meta {
   display: flex;
   flex-direction: column;
 }
-.sakura-footer-busuanzi {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 2px 6px;
-  margin: 0;
-  padding: 2px 0 0;
-  font-size: 0.8rem;
-  line-height: 1.35;
-  color: var(--sakura-color-text-muted);
-}
-.sakura-footer-busuanzi__row {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 2px 6px;
-}
-.sakura-footer-busuanzi span[id^="busuanzi_"] {
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  color: var(--sakura-color-primary);
-}
-.sakura-footer-busuanzi__sep {
-  color: color-mix(in srgb, var(--sakura-color-text-muted) 65%, transparent);
-}
 @media (max-width: 768px) {
   .sakura-footer-meta {
     flex-direction: column-reverse;
-  }
-
-  .sakura-footer-busuanzi {
-    flex-direction: column;
-    flex-wrap: nowrap;
-  }
-
-  .sakura-footer-busuanzi__sep--desktop {
-    display: none;
   }
 }
 .sakura-footer-powered {

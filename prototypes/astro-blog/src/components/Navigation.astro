@@ -1,0 +1,19 @@
+---
+import { primaryLinks, navigationGroups } from '../config/navigation';
+import Icon from './Icon.astro';
+const { active } = Astro.props;
+const moreActive = navigationGroups.some(group => group.links.some(link => link.label === active));
+---
+<div class="nav-row">
+  <nav class="primary-navigation" aria-label="主导航">
+    <div class="primary-links">{primaryLinks.map(link => <a href={link.href} class:list={{ active: active === link.label }} aria-current={active === link.label ? 'page' : undefined} target={link.external ? '_blank' : undefined} rel={link.external ? 'noreferrer' : undefined}>{link.label}</a>)}</div>
+    <details class="navigation-more" id="navigation-more">
+      <summary class:list={{ active: moreActive }}>更多 <Icon name="chevron" size={14} /></summary>
+      <div class="navigation-panel">
+        {navigationGroups.map(group => <section><h2>{group.label}</h2>{group.links.map(link => <a href={link.href} aria-current={active === link.label ? 'page' : undefined} target={link.external ? '_blank' : undefined} rel={link.external ? 'noreferrer' : undefined}><span><strong>{link.label}</strong><small>{link.description}</small></span><Icon name={link.external ? 'diagonal' : 'arrow'} size={15} /></a>)}</section>)}
+        <section class="site-tools"><h2>阅读工具</h2><button type="button" data-open-announcement>查看站点公告 <Icon name="book" size={15} /></button><button type="button" data-install-app>安装到桌面 <Icon name="diagonal" size={15} /></button><p data-install-status role="status"></p></section>
+      </div>
+    </details>
+  </nav>
+  <span class="nav-note"><span class="status-dot"></span> 独立书写，自由生长</span>
+</div>

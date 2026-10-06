@@ -1,0 +1,13 @@
+<div id="page-loader" class="page-loader" hidden aria-hidden="true" role="status" aria-live="polite" transition:persist="page-loader">
+  <div class="page-loader-content">
+    <div class="page-loader-scene" aria-hidden="true">
+      <div class="page-loader-cube page-loader-cube-outer">
+        {Array.from({ length: 6 }, (_, face) => <span class={`cube-face cube-face-${face}`} />)}
+      </div>
+      <div class="page-loader-cube page-loader-cube-inner">
+        {Array.from({ length: 6 }, (_, face) => <span class={`cube-face cube-face-${face}`} />)}
+      </div>
+    </div>
+    <p>正在翻开下一页</p>
+  </div>
+</div>

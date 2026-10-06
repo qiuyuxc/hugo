@@ -1,0 +1,17 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import PostRow from '../components/PostRow.astro';
+import { getPosts } from '../lib/posts';
+const posts = await getPosts();
+---
+<Base title="搜索笔记" active="搜索">
+  <div class="narrow-page">
+    <header class="page-intro"><p class="eyebrow">FIND A NOTE</p><h1>找一篇，慢慢读。</h1><p>在标题、摘要和标签里，找找你感兴趣的内容。</p></header>
+    <form class="search-form" role="search" action="/search/"><Icon name="search" /><input id="search-input" name="q" type="search" placeholder="试试 Cloudflare、CDN、图床…" aria-label="搜索文章标题、摘要和标签" autocomplete="off" /><button type="button" id="clear-search">清空</button></form>
+    <p class="search-status" id="search-status" role="status">全部 {posts.length} 篇文章</p>
+    <noscript><p class="preview-notice">开启 JavaScript 后可以筛选搜索结果，也可以直接浏览下方全部文章。</p></noscript>
+    <div>{posts.map(post => <PostRow post={post} index={1} />)}</div>
+    <div class="empty-state" id="search-empty" hidden><Icon name="search" size={30} /><h2>暂时没有找到这篇笔记。</h2><p>换个短一点的关键词试试，或者清空搜索看看全部文章。</p></div>
+  </div>
+</Base>

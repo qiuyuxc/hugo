@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { getPosts } from '../lib/posts';
+const posts = await getPosts();
+const categories = [...new Set(posts.flatMap(post => post.data.categories))];
+---
+<Base title="文章分类" active="分类">
+  <div class="narrow-page">
+    <header class="page-intro"><p class="eyebrow">FOLLOW YOUR INTEREST</p><h1>从一个兴趣开始。</h1><p>顺着不同的主题，翻翻我的笔记本。</p></header>
+    <div class="category-index">{categories.map((category, index) => <a href={`/?category=${encodeURIComponent(category)}#notes`}><span>{String(index + 1).padStart(2, '0')}</span><h2>{category}</h2><span>{posts.filter(post => post.data.categories.includes(category)).length} 篇</span><Icon name="diagonal" /></a>)}</div>
+  </div>
+</Base>

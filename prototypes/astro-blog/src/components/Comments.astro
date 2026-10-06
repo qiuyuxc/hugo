@@ -1,0 +1,12 @@
+---
+import { commentsConfig } from '../config/comments';
+const { title = '留下一点想法' } = Astro.props;
+---
+<section class="comments-section" id="comments" aria-labelledby="comments-heading" data-comments data-config={JSON.stringify(commentsConfig)}>
+  <div class="section-heading"><div><p class="eyebrow">LET'S TALK</p><h2 id="comments-heading">{title}</h2></div><a class="subtle-link" href={`https://github.com/${commentsConfig.repo}/discussions`} target="_blank" rel="noreferrer">在 GitHub 查看 ↗</a></div>
+  <p class="comments-description">暂由 giscus 承接讨论，使用 GitHub 登录。这里的留言会写入真实讨论区。</p>
+  <div class="comments-status" role="status" data-comment-status>正在准备评论…</div>
+  <div data-comment-mount></div>
+  <button class="outline-button" type="button" data-retry-comments hidden>重新加载评论</button>
+  <noscript><p>评论需要启用 JavaScript。你也可以通过上方链接在 GitHub 讨论区留言。</p></noscript>
+</section>

@@ -1,0 +1,24 @@
+---
+import { readFileSync } from 'node:fs';
+import { parse } from 'smol-toml';
+import { providerName } from '../lib/cdn';
+const config = parse(readFileSync(new URL('../../../../hugo.toml', import.meta.url), 'utf8'));
+const params = config.params as Record<string, unknown>;
+const footer = params.footer as { since?: number; serverInfo?: { enable?: boolean; asnFallback?: boolean; entries?: { text: string; url?: string; cdn?: string }[] } };
+const year = new Date().getFullYear();
+const since = footer.since || year;
+const servers = footer.serverInfo;
+---
+<footer class="site-footer shell" transition:name="site-footer" transition:animate="none">
+  <div class="footer-top">
+    <div class="footer-signature"><a class="footer-brand" href="/">kukie.</a><span>保持好奇，慢慢记录。</span></div>
+    <div class="footer-meta"><span>© {since === year ? year : `${since}–${year}`} Kukie</span><a href="https://github.com/qiuyuxc" target="_blank" rel="noreferrer">GitHub ↗</a><span>Built with Astro</span></div>
+  </div>
+  {servers?.enable && servers.entries?.length && <section class="footer-network" aria-label="站点服务与 CDN" data-footer-network data-asn-fallback={servers.asnFallback ? '1' : '0'}>
+    <span class="footer-network-caption">由这些连接，抵达这里<span aria-hidden="true">↳</span></span>
+    <ul class="footer-services">{servers.entries.map(entry => <li class="footer-service" data-server-url={entry.url || ''} data-server-cdn={entry.cdn || ''} title={entry.url || '当前站点'}>
+      <span class="footer-service-label">{entry.text === '评论' ? '评论 API' : entry.text}</span>
+      <span class="footer-service-provider" data-server-value>{entry.cdn ? providerName(entry.cdn) : '待识别'}</span>
+    </li>)}</ul>
+  </section>}
+</footer>

@@ -1,0 +1,21 @@
+<script is:inline>
+  try {
+    let saved;
+    try {
+      const key = 'kukie-page-exit-position';
+      saved = JSON.parse(sessionStorage.getItem(key) || 'null');
+      sessionStorage.removeItem(key);
+    } catch {}
+    const navigation = performance.getEntriesByType('navigation')[0];
+    if (navigation?.type === 'reload' && location.pathname === '/') {
+      // Reset before ClientRouter reads the position, avoiding a visible jump back up.
+      const url = new URL(location.href);
+      if (url.hash === '#notes') url.hash = '';
+      history.scrollRestoration = 'manual';
+      history.replaceState({ ...history.state, index: history.state?.index ?? 0, scrollX: 0, scrollY: 0 }, '', url);
+    } else if (navigation?.type === 'reload' && saved?.url === location.href && saved.index === history.state?.index && Number.isFinite(saved.scrollX) && Number.isFinite(saved.scrollY)) {
+      history.scrollRestoration = 'manual';
+      history.replaceState({ ...history.state, scrollX: saved.scrollX, scrollY: saved.scrollY }, '');
+    }
+  } catch {}
+</script>

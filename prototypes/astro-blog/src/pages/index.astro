@@ -1,0 +1,47 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import PostRow from '../components/PostRow.astro';
+import { getPosts, postUrl } from '../lib/posts';
+const posts = await getPosts();
+const categories = [...new Set(posts.flatMap(post => post.data.categories))];
+const tags = [...new Set(posts.flatMap(post => post.data.tags))];
+---
+<Base>
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="short-rule"></span> HELLO, I'M KUKIE</p>
+      <h1 id="hero-heading">折腾不止，<br />记录<span class="handwritten">不息。</span></h1>
+      <p class="hero-description">一些技术实践，一点生活随想。<br />把踩过的坑、发现的乐趣，写在这片自己的小天地。</p>
+      <a href="#notes" class="text-link">翻开我的笔记 <Icon name="arrow" size={19} /></a>
+      <div class="hero-footnote"><span>TECHNOLOGY</span><span class="small-cross">+</span><span>LIFE</span><span class="small-cross">+</span><span>CURIOSITY</span></div>
+    </div>
+    <figure class="hero-art">
+      <div class="hero-photo"><img src="/hero/hero-1.jpg" width="1024" height="768" alt="阳光下的动漫女孩用手比出取景框" fetchpriority="high" /><span class="photo-stamp">日常的切片 <span>01 / JOURNAL</span></span></div>
+      <figcaption><span>在代码之外，也别忘了看看世界。</span><span>✳</span></figcaption>
+    </figure>
+  </section>
+
+  <div class="journal-layout" id="notes">
+    <section class="notes-section" aria-labelledby="notes-heading">
+      <div class="section-heading"><div><p class="eyebrow">THE NOTEBOOK</p><h2 id="notes-heading">最近的记录<span class="heading-count">{String(posts.length).padStart(2, '0')}</span></h2></div><a class="subtle-link" href="/archives/">全部归档 <Icon name="diagonal" size={15} /></a></div>
+      <div class="filter-tabs" aria-label="按分类筛选文章"><button class="active" data-category="all" aria-pressed="true">全部文章 <span>{posts.length}</span></button>{categories.map(category => <button data-category={category} aria-pressed="false">{category}</button>)}</div>
+      <div class="post-list">{posts.map((post, index) => <PostRow post={post} index={index} />)}</div>
+      <p class="list-end" aria-live="polite"><span></span><span id="post-count">共 {posts.length} 篇记录，慢慢读。</span><span></span></p>
+    </section>
+
+    <aside class="journal-sidebar" aria-label="关于作者及文章分类">
+      <section class="author-note">
+        <p class="eyebrow">BEHIND THE WORDS</p>
+        <div class="author-heading"><img src="/hero/avatar.jpg" width="52" height="52" alt="Kukie 的头像" /><div><h2>你好，我是 Kukie<span> ✳</span></h2><p>一个喜欢折腾的普通人</p></div></div>
+        <p class="author-description">关注 Cloudflare、CDN 和网络优化。比起标准答案，更喜欢亲手试一试。</p>
+        <a class="text-link" href="/about/">再多了解一点 <Icon name="diagonal" size={16} /></a>
+        <div class="author-stats"><div><strong>{String(posts.length).padStart(2, '0')}</strong><span>篇文章</span></div><div><strong>{String(categories.length).padStart(2, '0')}</strong><span>个分类</span></div><div><strong>{String(tags.length).padStart(2, '0')}</strong><span>个标签</span></div></div>
+      </section>
+      <section class="sidebar-section"><div class="sidebar-title"><h2>按主题翻阅</h2><span>TOPICS</span></div><div class="topic-list">{categories.map((category, index) => <a href={`/?category=${encodeURIComponent(category)}#notes`}><span class="topic-index">{String(index + 1).padStart(2, '0')}</span><span>{category}</span><span class="topic-count">{posts.filter(post => post.data.categories.includes(category)).length}</span><Icon name="diagonal" size={14} /></a>)}</div></section>
+      <section class="sidebar-section"><div class="sidebar-title"><h2>常出现的关键词</h2><span>TAGS</span></div><div class="tag-cloud">{tags.slice(0, 12).map(tag => <a href={`/search/?q=${encodeURIComponent(tag)}`}>{tag}</a>)}</div></section>
+      <a class="random-note" href={postUrl(posts[Math.min(3, posts.length - 1)])} id="random-post"><Icon name="shuffle" size={22} /><div><strong>没有目的地，也挺好。</strong><span>随机翻开一篇笔记</span></div><Icon name="arrow" size={19} /></a>
+      <p class="sidebar-colophon">这个角落不大，<br />刚好装得下我的好奇心。</p>
+    </aside>
+  </div>
+</Base>

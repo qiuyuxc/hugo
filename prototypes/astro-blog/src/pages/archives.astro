@@ -1,0 +1,12 @@
+---
+import Base from '../layouts/Base.astro';
+import { getPosts, postUrl, dateLabel } from '../lib/posts';
+const posts = await getPosts();
+const years = [...new Set(posts.map(post => dateLabel(post.data.date).slice(0, 4)))];
+---
+<Base title="文章归档" active="文章归档">
+  <div class="narrow-page">
+    <header class="page-intro"><p class="eyebrow">A TRAIL OF CURIOSITY</p><h1>时间留下的笔记。</h1><p>共 {posts.length} 篇记录。那些折腾过的事，都在这里。</p></header>
+    {years.map(year => <section class="archive-year"><h2>{year}<span class="heading-count">{posts.filter(post => dateLabel(post.data.date).startsWith(year)).length}</span></h2><div>{posts.filter(post => dateLabel(post.data.date).startsWith(year)).map(post => <article class="archive-row"><time datetime={post.data.date.toISOString()}>{dateLabel(post.data.date).slice(5)}</time><h3><a href={postUrl(post)}>{post.data.title}</a></h3></article>)}</div></section>)}
+  </div>
+</Base>

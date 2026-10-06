@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import Comments from '../components/Comments.astro';
+const siteTemplate = JSON.stringify({ name: 'Kukie 的个人笔记', avatar: 'https://www.kukie.cn/hero/avatar.jpg', description: '记录个人随笔与技术实践', url: 'https://www.kukie.cn/' }, null, 2);
+const requestTemplate = JSON.stringify({ name: '你的站点名称', avatar: 'https://你的域名/avatar.png', description: '一句话介绍你的站点', url: 'https://你的域名/' }, null, 2);
+const requestUrl = new URL('https://github.com/qiuyuxc/hugo/issues/new');
+requestUrl.searchParams.set('title', '友链申请：你的站点名称');
+requestUrl.searchParams.set('body', `请将下方示例替换为你的站点信息后提交。\n\n\`\`\`json\n${requestTemplate}\n\`\`\`\n\n- [ ] 已将 https://www.kukie.cn/ 添加到本站友链\n`);
+---
+<Base title="友链" active="友链">
+  <div class="narrow-page">
+    <header class="page-intro"><p class="eyebrow">NEIGHBORS ON THE WEB</p><h1>互联网里的邻居。</h1><p>独立的小站，各自发光，也彼此相连。</p></header>
+    <section class="friends-intro"><h2>交换一扇通往彼此的窗。</h2><p>先把本站添加到你的友链，再通过 GitHub 提交申请，或者在下方留言。审核通过后再收录，不会自动发布。</p><p class="muted">原 Hugo 友链列表目前为空，暂不导入旧仓库的站点名单。</p></section>
+    <section class="friend-template"><div class="sidebar-title"><h2>本站信息</h2><span>ADD MY SITE</span></div><label class="sr-only" for="site-link-template">本站友链 JSON 模板</label><textarea id="site-link-template" readonly rows="6" spellcheck="false">{siteTemplate}</textarea><div class="template-actions"><button class="outline-button" data-copy-template="site-link-template"><Icon name="copy" size={15} /> 复制本站信息</button><span data-copy-status role="status"></span></div></section>
+    <section class="friend-template"><div class="sidebar-title"><h2>申请模板</h2><span>YOUR TURN</span></div><p>点击下方入口，在本站仓库 <code>qiuyuxc/hugo</code> 创建友链申请 Issue。申请页已带上模板，替换为你的站点信息后提交即可。</p><label class="sr-only" for="request-link-template">友链申请 JSON 模板</label><textarea id="request-link-template" readonly rows="6" spellcheck="false">{requestTemplate}</textarea><div class="template-actions"><button class="outline-button" data-copy-template="request-link-template"><Icon name="copy" size={15} /> 复制申请模板</button><span data-copy-status role="status"></span></div><a class="text-link" href={requestUrl.href} target="_blank" rel="noreferrer">去 GitHub 提交申请 <Icon name="diagonal" size={16} /></a></section>
+    <Comments title="来做个邻居吧" />
+  </div>
+</Base>

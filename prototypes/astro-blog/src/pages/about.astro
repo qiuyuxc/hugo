@@ -1,0 +1,12 @@
+---
+import Base from '../layouts/Base.astro';
+import { getEntry, render } from 'astro:content';
+const page = await getEntry('pages', 'about');
+const { Content } = await render(page!);
+---
+<Base title="关于 Kukie" active="关于">
+  <div class="narrow-page">
+    <header class="page-intro"><p class="eyebrow">A LITTLE ABOUT ME</p><h1>你好，路过的朋友。</h1><p>欢迎来到 Kukie 的个人笔记。</p></header>
+    <div class="about-layout"><article class="prose"><Content /></article><figure class="about-photo"><img src="/hero/avatar.jpg" alt="Kukie 的头像" width="230" height="230" /><figcaption>是我，Kukie。</figcaption></figure></div>
+  </div>
+</Base>

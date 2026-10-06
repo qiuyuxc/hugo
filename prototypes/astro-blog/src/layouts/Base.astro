@@ -1,0 +1,62 @@
+---
+import '../styles/global.css';
+import '../styles/interactions.css';
+import { ClientRouter } from 'astro:transitions';
+import Icon from '../components/Icon.astro';
+import Navigation from '../components/Navigation.astro';
+import Announcement from '../components/Announcement.astro';
+import Footer from '../components/Footer.astro';
+import ScrollRestoration from '../components/ScrollRestoration.astro';
+import PageLoader from '../components/PageLoader.astro';
+interface Props { title?: string; description?: string; active?: string; }
+const { title, description = '记录个人随笔与技术实践。关于 Cloudflare、CDN、网络，也关于生活里的小小发现。', active = '首页' } = Astro.props;
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#f8f9f5" />
+    <meta name="giscus:backlink" content={new URL(Astro.url.pathname, Astro.site).href} />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>{title ? `${title} · Kukie 的个人笔记` : 'Kukie 的个人笔记 · 折腾，也记录'}</title>
+    <link rel="icon" href="/favicon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/app-icon-192.png" />
+    <link rel="stylesheet" href="/fonts/lxgw-wenkai-screen/lxgwwenkaiscreenr.css" />
+    <ScrollRestoration />
+    <ClientRouter />
+    <script is:inline>
+      document.documentElement.dataset.pageEntry = '';
+      document.addEventListener('astro:before-preparation', () => {
+        delete document.documentElement.dataset.pageEntry;
+      }, { once: true });
+      try {
+        document.documentElement.dataset.theme = localStorage.getItem('kukie-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到正文</a>
+    <header class="site-header shell" transition:name="site-header" transition:animate="none">
+      <div class="masthead">
+        <a href="/" class="brand" aria-label="Kukie 的个人笔记，首页">kukie<span>.</span><span class="brand-caption">个人笔记<br /><small>A PERSONAL JOURNAL</small></span></a>
+        <div class="header-actions">
+          <a class="search-trigger" href="/search/" aria-label="搜索文章"><Icon name="search" size={18} /><span>搜索笔记</span><kbd>/</kbd></a>
+          <span class="action-divider"></span>
+          <button class="icon-button theme-toggle" type="button" aria-label="切换深色模式" title="切换日夜主题"><span class="sun-icon"><Icon name="sun" size={19} /></span><span class="moon-icon"><Icon name="moon" size={19} /></span></button>
+        </div>
+      </div>
+      <Navigation active={active} />
+    </header>
+    <main id="main" class="shell"><slot /></main>
+    <Footer />
+    <Announcement />
+    <PageLoader />
+    <script>
+      import '../scripts/runtime';
+    </script>
+  </body>
+</html>

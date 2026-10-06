@@ -3,7 +3,17 @@ import pwaIntegration from './scripts/pwa-integration.mjs';
 
 export default defineConfig({
   site: 'https://www.kukie.cn',
-  integrations: [pwaIntegration()],
+  integrations: [
+    {
+      name: 'legacy-url-redirects',
+      hooks: {
+        'astro:config:setup': ({ injectRoute }) => injectRoute({
+          pattern: '/_redirects', entrypoint: './src/endpoints/redirects.ts', prerender: true
+        })
+      }
+    },
+    pwaIntegration()
+  ],
   publicDir: '../../static',
   trailingSlash: 'always',
   image: { service: { entrypoint: 'astro/assets/services/noop' } },

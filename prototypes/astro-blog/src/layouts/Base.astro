@@ -8,8 +8,11 @@ import Announcement from '../components/Announcement.astro';
 import Footer from '../components/Footer.astro';
 import ScrollRestoration from '../components/ScrollRestoration.astro';
 import PageLoader from '../components/PageLoader.astro';
+import { isPublished } from '../config/site';
 interface Props { title?: string; description?: string; active?: string; }
 const { title, description = '记录个人随笔与技术实践。关于 Cloudflare、CDN、网络，也关于生活里的小小发现。', active = '首页' } = Astro.props;
+const noindex = !isPublished || /^\/(?:search|offline|404(?:\.html)?)(?:\/|$)/.test(Astro.url.pathname);
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
 ---
 <!doctype html>
 <html lang="zh-CN">
@@ -17,7 +20,9 @@ const { title, description = '记录个人随笔与技术实践。关于 Cloudfl
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="robots" content="noindex, nofollow" />
+    <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" type="application/rss+xml" title="Kukie 的个人笔记" href="/index.xml" />
     <meta name="theme-color" content="#f8f9f5" />
     <meta name="giscus:backlink" content={new URL(Astro.url.pathname, Astro.site).href} />
     <meta name="apple-mobile-web-app-capable" content="yes" />

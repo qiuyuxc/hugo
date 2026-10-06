@@ -8,6 +8,7 @@
     "test:motion": "node tests/motion.mjs",
     "test:navigation": "node tests/navigation.mjs",
     "test:scroll": "node tests/scroll.mjs",
+    "test:publication": "node tests/publication.mjs",
     "build": "astro build",
     "preview": "astro preview --host 0.0.0.0 --port 8085"
   },

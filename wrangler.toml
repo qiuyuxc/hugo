@@ -1,12 +1,14 @@
 # Cloudflare Pages 配置
-# 文档：https://developers.cloudflare.com/pages/framework-guides/deploy-a-hugo-site/
+# 网站前端使用 Astro；根目录构建脚本将产物写入 public/。
+# 文档：https://developers.cloudflare.com/pages/configuration/build-configuration/
 name = "kukie-hugo-blog"
 compatibility_date = "2026-06-19"
 pages_build_output_dir = "./public"
 
 # 在 Cloudflare Dashboard → Build 中设置：
+#   Root directory: 留空（仓库根目录）
 #   Build command: pnpm run build
 #   Build output directory: public
 #
-# npm run build 会在 CF 环境（CF_PAGES=1）自动下载 Hugo Extended 0.163.3。
-# 请勿使用裸命令 hugo，否则会落到 CF 默认的旧版本导致模板构建失败。
+# 框架预设可以选 Astro，但实际执行以构建命令和本文件为准。
+# 旧 Hugo 构建保留为 node scripts/build-hugo.mjs，不用于默认部署。

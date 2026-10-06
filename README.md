@@ -1,6 +1,6 @@
 # Kukie 的个人笔记
 
-基于 **Hugo + [hugo-theme-aiovtue](https://github.com/AIOVTUE/hugo-theme-aiovtue)**（整站方案）的个人博客，由原 `hugo-theme-stack` 版本迁移而来。
+网站前端使用 **Astro**，源码位于 `prototypes/astro-blog/`，继续读取仓库中的 Markdown、静态资源与部分 Hugo 配置。旧 Hugo 主题和构建脚本保留供维护使用；API、控制台和原生 App 的迁移另行进行。
 
 - 线上地址：https://www.kukie.cn/
 - 内容语言：简体中文
@@ -9,7 +9,8 @@
 
 | 路径 | 说明 |
 |------|------|
-| `hugo.toml` | 站点全部配置（标题、Hero、导航、社交、页脚、评论等） |
+| `prototypes/astro-blog/` | Astro 前端、独立开发命令与页面测试 |
+| `hugo.toml` | 保留的 Hugo 配置，Astro 复用其中公告与页脚配置 |
 | `content/posts/` | 文章，每篇一个 Markdown 文件，文件名即 URL slug |
 | `content/about.md` | 关于页正文 |
 | `content/links.md` + `data/links.yaml` | 友链页壳子与友链数据 |
@@ -19,20 +20,21 @@
 | `themes/aiovtue/` | 主题本体（随仓库 vendored，非 git submodule） |
 | `layouts/partials/head.html` | 站点级 `<head>` 覆盖（已加入 Umami 统计，同步主题更新时留意） |
 | `assets/css/site-banner.css` `assets/js/site-banner.js` `layouts/partials/site-banner.html` | 站点顶栏公告（动态，见下文） |
-| `.github/workflows/deploy.yml` | GitHub Pages 自动部署 |
+| `.github/workflows/indexnow.yml` | 向 IndexNow 提交网站 URL |
 
 ## 本地开发
 
-需要 [Hugo Extended](https://gohugo.io/installation/)（0.146+，含内置 Dart Sass；主题作者使用 0.163）。
+使用 Node.js 22（仓库 `.node-version` 固定为 22.20.0）和 pnpm 10.11.1（`packageManager` 固定版本）。
 
 ```bash
-pnpm install        # 首次安装脚本依赖（sharp 等）
-pnpm dev            # 启动开发服务器 http://localhost:1313
-pnpm build          # 构建到 public/
+npm --prefix prototypes/astro-blog ci
+npm --prefix prototypes/astro-blog run dev  # http://localhost:8085/
+pnpm run build                            # Astro 正式构建到 public/
 ```
 
-> `pnpm dev` / `pnpm build` 会调用 `scripts/` 下的辅助脚本（补全静态资源、友链 RSS、追番数据）。
-> 本项目未启用追番与友链 RSS，相关脚本会自动跳过；也可以只运行 `hugo server` 预览。
+根目录 `build` / `build:cf` 均进入 `scripts/build.mjs`，安装 Astro 子项目的锁定依赖并构建。直接在子项目运行 `build` 则输出至其 `dist/`，供本地验证，默认禁止搜索引擎收录。原 Hugo 版本仍可用 `pnpm dev` 或 `node scripts/build-hugo.mjs` 维护，需要 Hugo Extended。
+
+下方旧主题、Twikoo 等配置说明仅适用于保留的 Hugo 版本。Astro 的当前功能与验证方式见 [前端说明](prototypes/astro-blog/NOTES.md)。
 
 ## 写文章
 
@@ -129,14 +131,14 @@ JSON 字段（`text` 之外都可选）：
 
 ## 部署
 
-- **GitHub Pages（当前默认）**：推送到 `main` / `master` 分支后由 `.github/workflows/deploy.yml` 自动构建部署。
-- **Bing 收录推送（IndexNow，免账号）**：每次 GitHub Pages 部署完成后，`submit-indexnow` 任务自动拉取线上 `sitemap.xml` 并把全部 URL 提交到 `api.indexnow.org`（必应等参与搜索引擎共享），发版即推送。
+- **Cloudflare Pages（当前网站部署）**：根目录留空，构建命令 `pnpm run build`，输出目录 `public`；框架预设可选 Astro。只改预设不会改写仓库的构建脚本，实际入口与输出路径见 `scripts/build.mjs` 和 `wrangler.toml`。
+- **Bing 收录推送（IndexNow，免账号）**：`.github/workflows/indexnow.yml` 推送线上 URL；网站构建由 Cloudflare Pages 负责，仓库未启用 GitHub Pages。
   - key 文件：`static/92245a642338954199d4b6a48196c5ad.txt`（内容=文件名=32 位 hex，已随站部署；可访问 `https://www.kukie.cn/92245a642338954199d4b6a48196c5ad.txt` 验证）。
   - 手动重推：Actions 里对该工作流点 `Run workflow`，结果看 `submit-indexnow` 任务日志（HTTP 200/202 即成功）。
-  - 更换域名或重新生成 key：同步修改 `deploy.yml` 的 `SITE_BASE` / `INDEXNOW_KEY`，并替换 `static/` 下同名 key 文件。
-- **Cloudflare Pages / Vercel / Netlify**：仓库已附 `wrangler.toml`、`vercel.json`、`netlify.toml`，构建命令统一为 `pnpm run build`（CF 等平台会自动下载 Hugo Extended 0.163.3），输出目录 `public`。
+  - 更换域名或重新生成 key：同步修改 `indexnow.yml` 的 `SITE_BASE` / `INDEXNOW_KEY`，并替换 `static/` 下同名 key 文件。
+- **Vercel / Netlify**：保留根目录构建入口与 `public` 输出，使用同一套 Astro 构建。Cloudflare / Netlify 可直接读取产物中的 `_redirects`；其他托管平台需配置等效的旧地址跳转规则。
 
-部署前请确认 `hugo.toml` 中 `baseURL` 与最终访问域名一致。GitHub Pages 工作流会用 Actions 提供的 Pages URL 覆盖构建时的 `baseURL`（与迁移前行为一致）。
+Astro 正式构建生成 canonical、`robots.txt`、`sitemap.xml`、`index.xml` 和旧文章/分类/标签的跳转规则；正式域名在 `prototypes/astro-blog/astro.config.mjs` 与 `src/config/site.ts` 中维护。根构建将 `PUBLIC_SITE_RELEASE` 设为正式模式，Cloudflare 非 master 分支、Netlify 非 production context 和 Vercel 非 production 环境使用禁止收录的预览模式。API 和原生 App 不在此构建流程中。
 
 ## 迁移记录（2026-09-09）
 

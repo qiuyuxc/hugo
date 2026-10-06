@@ -1,6 +1,7 @@
 {
   "name": "kukie-hugo-blog",
   "private": true,
+  "packageManager": "pnpm@10.11.1",
   "scripts": {
     "fetch-static": "node scripts/fetch-missing-static.mjs",
     "dev": "node scripts/fetch-missing-static.mjs && node scripts/fetch-links-rss.mjs && node scripts/fetch-bangumi.mjs && hugo server -D --disableFastRender",
